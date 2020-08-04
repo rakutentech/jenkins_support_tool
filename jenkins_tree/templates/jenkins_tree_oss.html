@@ -1,0 +1,99 @@
+<HEAD>
+<TITLE>Jenkins server info</TITLE>
+
+<script type="text/javascript">
+{literal}
+function allcheck( tf ) {
+   var ElementsCount = document.updateform.elements.length; // チェックボックスの数
+   for( i=0 ; i<ElementsCount ; i++ ) {
+      document.updateform.elements[i].checked = tf; // ON・OFFを切り替え
+   }
+}
+{/literal}
+</script>
+
+</HEAD>
+
+
+
+<B><FONT SIZE=+2>Jenkins Tree</FONT></B>
+<HR NOSHADE>
+<P>
+ <TABLE BORDER=0  CELLPADDING=0 cellspacing=0>
+ <TR>
+ <TD>
+ {foreach from=$summaryArray key=$server_id item=$hash}
+ <A HREF="?selected_server_id={$server_id}">{$server_id}</A><BR>
+ {/foreach}
+ </TD>
+ </TR>
+ </TABLE>
+<P>
+{if $selected_server_id != "none"}
+<B><FONT SIZE=+2>{$selected_server_id}</FONT></B>
+<BR>
+<B>
+
+<!-- Directory location -->
+<TABLE BORDER=0  CELLPADDING=0 cellspacing=0>
+<TR>
+ <TD><IMG SRC="/image/folder.png"></TD>
+ <TD><A HREF="?selected_server_id={$selected_server_id}&selected_path="><FONT SIZE=+1>TOP/</FONT> </A></TD>
+{assign var="target_folder" value=""}
+{foreach from=$foldersArray item=$folder}
+{assign var="target_folder" value="`$target_folder`job/`$folder`"}
+<TD><IMG SRC="/image/folder.png"> </TD>
+<TD><A HREF="?selected_server_id={$selected_server_id}&selected_path={$target_folder}"><FONT SIZE=+1>{$folder}</FONT> </A></TD>
+{/foreach}
+</TR>
+</TABLE>
+<!--// Directory location -->
+
+<!-- File List  -->
+<FORM METHOD=POST ACTION="jenkins_tree_update_api_oss.php" NAME=updateform>
+<INPUT TYPE=HIDDEN NAME="selected_server_id" VALUE="{$selected_server_id}">
+<INPUT TYPE=HIDDEN NAME="selected_path" VALUE="{$selected_path}">
+
+<TABLE BORDER=0  CELLPADDING=0 cellspacing=0>
+<TR><TH>Enable<BR>Disable</TH><TH>&nbsp;Status&nbsp;</TH><TH> Name </TH><TH>&nbsp;&nbsp;&nbsp; status &nbsp;</TH><TH>&nbsp;&nbsp;&nbsp; last success &nbsp;</TH><TH>&nbsp;&nbsp;&nbsp; last failure &nbsp;</TH><TH> Jenkins Link </TH></TR>
+
+{foreach from=$jobsArray key=$job_name item=$hash}
+<TR>
+<TH>
+{if $hash['class'] === "hudson.model.FreeStyleProject" || $hash['class'] === "org.jenkinsci.plugins.workflow.job.WorkflowJob"}
+ <INPUT TYPE=CHECKBOX NAME=able[] VALUE={$job_name} {if $hash['color'] !== "disabled"} CHECKED {/if}> 
+{/if}
+</TH>
+<TH>
+{if $hash['class'] === "com.cloudbees.hudson.plugins.folder.Folder"}<IMG SRC="/image/folder.png">{/if}
+{if $hash['class'] === "hudson.model.FreeStyleProject" || $hash['class'] === "org.jenkinsci.plugins.workflow.job.WorkflowJob"}<IMG SRC="/image/{$hash['color']}.gif">{/if}
+</TH>
+</TH>
+<TH ALIGN=left>
+{if $hash['class'] === "com.cloudbees.hudson.plugins.folder.Folder"}
+<A HREF="?selected_server_id={$selected_server_id}&selected_path={$hash['path']}">
+{/if}
+{$job_name}
+</TH>
+<TD ALIGN=center {if $hash['color'] === "disabled"}BGCOLOR=lightgray{/if}>{$hash['color']}</TD>
+<TD>{if $hash['last_success_timestamp'] !== ""} &nbsp;{$hash['last_success_timestamp']}&nbsp;{/if}</TD>
+<TD>{if $hash['last_failure_timestamp'] !== ""} &nbsp;{$hash['last_failure_timestamp']}&nbsp;{/if}</TD>
+
+
+<TD><A HREF="{$hash['url']}">LINK</A></TD>
+</TR>
+{/foreach}
+</TABLE>
+<BR>
+<input type="button" value="all ON" onclick="allcheck(true);">
+<input type="button" value="all OFF" onclick="allcheck(false);">
+<INPUT TYPE=SUBMIT VALUE="update">
+
+</FORM>
+<!--// File List  -->
+
+{/if}
+
+
+
+</HTML>
