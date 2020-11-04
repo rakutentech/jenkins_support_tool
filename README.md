@@ -14,8 +14,6 @@ But this tool support you to set many job status in bulk.
 <IMG SRC="https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/267085/7a7a19b0-d4a5-3779-1a07-9676c438b0ca.png">
 
 
-
-
 ## How to build
 
 ### Jenkins Tree
